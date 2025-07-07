@@ -28,31 +28,28 @@ class fileList{
                 return -1;
             }
 
-            makefile.open("makefile");
-            if(!makefile.is_open()){
-                return -1;
-            }
-
             return 0;
         }
 
         int fillFilesList(){
-            #ifdef _WIN32
+            /*#ifdef _WIN32
                 system("dir /b /a:-d >> wmakeTemp.txt");
-            #elif __LINUX__
-                system("ls >> wmakeTempt.txt");
-            #endif
+            #else*/
+                system("ls >> wmakeTemp.txt");
+            //#endif
             inputFile.open("wmakeTemp.txt");
             if (inputFile.is_open()){
-                std::string tempStr;
+                std::string tempStr = "";
                 while(inputFile >> tempStr){
                     if (tempStr.find(sourceExt) != std::string::npos){
                         sourceFiles.push_back(tempStr);
+                        filePairs.push_back(std::make_pair(tempStr.substr(0, tempStr.find_first_of('.', 0)) + sourceExt, tempStr.substr(0, tempStr.find_first_of('.', 0)) + ".o"));
                     }
                     else if(tempStr.find(headerExt) != std::string::npos){
                         headerFiles.push_back(tempStr);
-                    }
+                    }  
                 }
+                
                 inputFile.close();
             }
 
@@ -61,11 +58,49 @@ class fileList{
         }
 
         void writeMakeFile(){
-            makefile << goal << ":" << std::endl << "\t" << compiler << " ";
-            for (auto it = sourceFiles.begin(); it != sourceFiles.end(); ++it){
-                makefile << *it << " "; 
+            makefile.open("makefile");
+            if(!makefile.is_open()){
+                return;
             }
-            makefile << "-o " << goal;
+            makefile << goal << ":";
+            for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                makefile << " " << it->second; 
+            }
+            makefile << "\n\t" << compiler;
+            for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                makefile << " " << it->second; 
+            }
+            makefile << " -o " << goal << "\n";
+
+            for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                makefile << it->second << ": " << it->first << "\n\t";
+                makefile << compiler << " -c " <<  it->first << " -o " << it->second << "\n";
+            }
+		/*
+            #ifdef _WIN32
+                makefile << std::endl << "clean:\n\tdel /Q";
+                for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                    makefile << " " << it->second;  
+                }
+                makefile << " " << goal + ".exe";
+
+                makefile << std::endl << "c:\n\tdel /Q";
+                for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                    makefile << " " << it->second;  
+                }
+            #else*/
+                makefile << std::endl << "clean:\n\trm -f";
+                for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                    makefile << " " << it->second;  
+                }
+                makefile << " " << goal;
+
+                makefile << std::endl << "c:\n\trm -f";
+                for (auto it = filePairs.begin(); it != filePairs.end(); ++it){
+                    makefile << " " << it->second;  
+                }
+            //#endif
+
 
         }
 
@@ -77,22 +112,39 @@ class fileList{
                 std::cout << sNumber << "\t" << *it << '\n'; 
                 sNumber++;
             }
+
             std::cout << "header files:\n";
             for (auto it = headerFiles.begin(); it != headerFiles.end(); ++it){
                 std::cout << hNumber << "'\t" << *it << '\n'; 
                 hNumber++;
             }
         }
+
+        int readFromExistingmakefile(){
+            std::ifstream file("makefile");
+            if (file.is_open()){
+                std::string target; 
+                std::string tempCompiler;
+                file >> target;
+                file >> tempCompiler;
+                goal = target.substr(0, target.find_first_of(':', 0));
+                compiler = tempCompiler;
+                return 0;
+            }
+            else {
+                std::cout << "no existing makefile\n";
+                return -1;
+            }
+        }
 };
 
 int main(int argc, char *argv[]){
-
+    fileList f;
     if (argc < 3){
         std::cout << "usage: wmake <compiler> <final exe name>\n";
         return 0;
     }
 
-    fileList f;
     f.assignCompilerAndOpenFile(argv[1], argv[2]);
     f.fillFilesList();
     f.listContentsOfVector();
