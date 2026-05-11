@@ -1,2 +1,2 @@
 # wmake
- a "tool" that make a makefile from all source files in the current directory
+ a ""tool"" that generates a """""""makefile""""""" to compile all source files in the current directory
