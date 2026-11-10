@@ -15,11 +15,11 @@ class fileList{
         int assignCompilerAndOpenFile(std::string compiler, std::string goal){
             this->goal = goal;
             this->compiler = compiler;
-            if(compiler == "g++"){
+            if(compiler == "g++" || compiler == "clang++"){
                 headerExt = ".hpp";
                 sourceExt = ".cpp";
             }
-            else if(compiler == "gcc"){
+            else if(compiler == "gcc" || compiler == "clang"){
                 headerExt = ".h";
                 sourceExt = ".c";
             }
