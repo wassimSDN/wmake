@@ -104,7 +104,7 @@ class fileList{
             for(size_t i = 0; i < filePairs.size(); i++)
             {
                 makefile <<  "./obj/" << filePairs[i].second << ": " << filePairs[i].first << "\n\t";
-                makefile << compiler << " -Wextra -Wall "<< "-c " << filePairs[i].first << " -o " << " ./obj/" << filePairs[i].second << '\n';
+                makefile << compiler << " -Wextra -Wall "<< "-c " << filePairs[i].first << " -o " << "./obj/" << filePairs[i].second << '\n';
             }
 
             #if defined(_WIN32)
