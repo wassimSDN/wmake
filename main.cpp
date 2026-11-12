@@ -16,14 +16,13 @@ class fileList{
         {
             this->goal = goal;
             this->compiler = compiler;
+            headerExt = ".h";
             if(compiler == "g++" || compiler == "clang++")
             {
-                headerExt = ".hpp";
                 sourceExt = ".cpp";
             }
             else if(compiler == "gcc" || compiler == "clang")
             {
-                headerExt = ".h";
                 sourceExt = ".c";
             }
             else
