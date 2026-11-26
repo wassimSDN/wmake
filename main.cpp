@@ -9,6 +9,7 @@
 # include <unistd.h>
 # include <sys/stat.h>
 # include <sys/types.h>
+# include <cstring>
 #else 
 # error "os not supported"
 #endif
@@ -73,7 +74,7 @@ class fileList{
             result = mkdir("./obj/", 0777);
             if (result)
             {
-                std::cerr << "Failed to create obj directory, create it manually: " << strerror(errno) << '\n';
+                std::cerr << "Failed to create obj directory, create it manually: " << strerror(result) << '\n';
                 return false;
             }
 #else
