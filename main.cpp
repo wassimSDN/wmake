@@ -2,6 +2,26 @@
 #include <fstream>
 #include <vector>
 
+//os includes
+#if defined(_WIN32)
+# include <Windows.h>
+#elif defined(__linux__)
+# include <unistd.h>
+#else 
+# error "os not supported"
+#endif
+
+void PrintWindowsError()
+{
+    LPSTR Message = nullptr;
+    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                   nullptr, GetLastError(), 0, (LPSTR)&Message, 0, nullptr);
+
+    std::cerr << Message << '\n';
+
+    LocalFree(Message);
+}
+
 class fileList{
     private:
         std::string compiler;
@@ -31,6 +51,31 @@ class fileList{
                 return false;
             }
 
+            return true;
+        }
+
+        bool CreateObjDirectory()
+        {
+            int result = 0;
+#if defined(_WIN32)            
+            result = CreateDirectory(".\\obj\\", nullptr);
+            if (!result)
+            {
+                std::cerr << "Failed to create obj directory, create it manually: ";
+                PrintWindowsError();
+                return false;
+            }
+#elif defined(__linux__)
+            result = mkdir("./obj/");
+            if (result)
+            {
+                std::cerr << "Failed to create obj directory, create it manually: " << strerror(errno) << '\n';
+                return false;
+            }
+#else
+# error "os not supported"
+            return false;
+#endif
             return true;
         }
 
@@ -188,7 +233,8 @@ class fileList{
 
 int main(int argc, char *argv[]){
     fileList f;
-    if (argc < 3){
+    if (argc < 3)
+    {
         std::cout << "usage: wmake <compiler> <final exe name>\n";
         return 0;
     }
@@ -206,4 +252,5 @@ int main(int argc, char *argv[]){
     {
         return  1;
     }
+    f.CreateObjDirectory();
 }
