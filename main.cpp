@@ -70,7 +70,7 @@ class fileList{
                 return false;
             }
 #elif defined(__linux__)
-            result = mkdir("./obj/");
+            result = mkdir("./obj/", 0777);
             if (result)
             {
                 std::cerr << "Failed to create obj directory, create it manually: " << strerror(errno) << '\n';
