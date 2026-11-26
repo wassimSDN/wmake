@@ -153,7 +153,7 @@ class fileList{
             {
                 makefile << " ./obj/" << filePairs[i].second;
             }
-            makefile << " -o " << goal << "$(LIBS)" << '\n';
+            makefile << " -o " << goal << " $(LIBS) " << '\n';
 
             for(size_t i = 0; i < filePairs.size(); i++)
             {
