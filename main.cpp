@@ -11,6 +11,7 @@
 # error "os not supported"
 #endif
 
+#if defined(_WIN32)
 void PrintWindowsError()
 {
     LPSTR Message = nullptr;
@@ -21,6 +22,7 @@ void PrintWindowsError()
 
     LocalFree(Message);
 }
+#endif
 
 class fileList{
     private:
