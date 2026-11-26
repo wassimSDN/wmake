@@ -7,6 +7,8 @@
 # include <Windows.h>
 #elif defined(__linux__)
 # include <unistd.h>
+# include <sys/stat.h>
+# include <sys/types.h>
 #else 
 # error "os not supported"
 #endif
